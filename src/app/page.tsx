@@ -2,56 +2,63 @@ import Link from 'next/link'
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-4">
-      <main className="max-w-4xl w-full text-center space-y-8">
-        <h1 className="text-5xl font-extrabold text-indigo-800 mb-8">
-          Sinapsia Polirrubro
-        </h1>
-        <p className="text-xl text-gray-600 mb-12">
-          Sistema de Gestión de Punto de Venta e Inventario
-        </p>
+    <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-6 relative overflow-hidden">
+      {/* Background Decor */}
+      <div className="absolute top-0 left-0 w-full h-64 bg-indigo-600 skew-y-3 transform -translate-y-20 z-0"></div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <main className="max-w-5xl w-full text-center space-y-10 relative z-10">
+        <div className="text-white mb-16">
+          <h1 className="text-6xl font-extrabold tracking-tight mb-4 drop-shadow-md">
+            Sinapsia Polirrubro
+          </h1>
+          <p className="text-2xl text-indigo-100 font-light">
+            Sistema Integral de Gestión
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 px-4">
           {/* POS Card */}
           <Link
             href="/pos"
-            className="group block p-8 bg-white rounded-2xl shadow-xl hover:shadow-2xl transition-all border-l-8 border-green-500 hover:-translate-y-1"
+            className="group block p-10 bg-white rounded-3xl shadow-xl hover:shadow-2xl transition-all transform hover:-translate-y-2 border border-slate-100 relative overflow-hidden"
           >
-            <div className="text-left">
-              <h2 className="text-3xl font-bold text-gray-800 group-hover:text-green-600 transition-colors mb-2">
-                🛒 Punto de Venta
+            <div className="absolute top-0 right-0 w-32 h-32 bg-green-50 rounded-bl-full -mr-8 -mt-8 transition-transform group-hover:scale-110"></div>
+            <div className="text-left relative z-10">
+              <div className="w-16 h-16 bg-green-100 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-green-600 transition-colors">
+                <span className="text-4xl group-hover:text-white transition-colors">🛒</span>
+              </div>
+              <h2 className="text-4xl font-bold text-slate-800 group-hover:text-green-600 transition-colors mb-4">
+                Punto de Venta
               </h2>
-              <p className="text-gray-500">
-                Realizar ventas, escanear productos y cobrar.
+              <p className="text-slate-500 text-lg">
+                Realizar ventas rápidas, control de caja y facturación.
               </p>
             </div>
           </Link>
 
           {/* Inventory Card */}
           <Link
-            href="/inventory" // Assumed path based on previous context, or I should check if I made a page for it.
-            // Wait, I made components/inventory/* but did I make a page? 
-            // I recall 'integration/inventory-flow.test.tsx' used components directly?
-            // Let me check if src/app/inventory/page.tsx exists.
-            // If not, I should point to where the inventory list is, or create it.
-            // Based on previous turn: "Frontend: Product List Component" was done. 
-            // I'll assume /inventory is safe or I will check next.
-            className="group block p-8 bg-white rounded-2xl shadow-xl hover:shadow-2xl transition-all border-l-8 border-indigo-500 hover:-translate-y-1"
+            href="/inventory"
+            className="group block p-10 bg-white rounded-3xl shadow-xl hover:shadow-2xl transition-all transform hover:-translate-y-2 border border-slate-100 relative overflow-hidden"
           >
-            <div className="text-left">
-              <h2 className="text-3xl font-bold text-gray-800 group-hover:text-indigo-600 transition-colors mb-2">
-                📦 Inventario
+            <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-50 rounded-bl-full -mr-8 -mt-8 transition-transform group-hover:scale-110"></div>
+            <div className="text-left relative z-10">
+              <div className="w-16 h-16 bg-indigo-100 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-indigo-600 transition-colors">
+                <span className="text-4xl group-hover:text-white transition-colors">📦</span>
+              </div>
+              <h2 className="text-4xl font-bold text-slate-800 group-hover:text-indigo-600 transition-colors mb-4">
+                Inventario
               </h2>
-              <p className="text-gray-500">
-                Gestionar productos, stock y precios.
+              <p className="text-slate-500 text-lg">
+                Gestión de productos, control de stock y precios.
               </p>
             </div>
           </Link>
         </div>
       </main>
 
-      <footer className="mt-16 text-gray-400">
-        v0.1.0 - Powered by Antigravity
+      <footer className="mt-20 text-slate-400 text-sm font-medium">
+        v0.1.0 • Powered by Antigravity
       </footer>
     </div>
   )
