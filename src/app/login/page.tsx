@@ -19,7 +19,8 @@ export default function LoginPage() {
 
         try {
             await signIn(email, password)
-            router.push('/') // Redirect to Dashboard
+            // Use window.location.href to force a full reload and ensure middleware picks up the new session cookie
+            window.location.href = '/'
         } catch (err: any) {
             setError(err.message || 'Error al iniciar sesión')
         } finally {
