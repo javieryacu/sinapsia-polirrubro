@@ -12,9 +12,14 @@ export const signIn = async (email: string, password: string) => {
 }
 
 export const signUp = async (email: string, password: string) => {
+    const origin = typeof window !== 'undefined' ? window.location.origin : ''
+
     const { data, error } = await supabase.auth.signUp({
         email,
-        password
+        password,
+        options: {
+            emailRedirectTo: `${origin}/auth/callback`
+        }
     })
 
     if (error) throw new Error(error.message)
