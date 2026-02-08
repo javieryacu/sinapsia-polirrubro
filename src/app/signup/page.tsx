@@ -30,16 +30,18 @@ export default function SignupPage() {
 
     if (success) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-slate-100 p-4">
-                <div className="bg-white p-10 rounded-2xl shadow-xl w-full max-w-sm border border-slate-100 text-center">
-                    <div className="mb-6 text-green-500">
-                        <svg className="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <div className="min-h-screen flex items-center justify-center bg-slate-950 p-4">
+                <div className="bg-slate-900 border border-slate-800 p-8 rounded-xl shadow-2xl w-full max-w-sm text-center">
+                    <div className="mb-6 flex justify-center">
+                        <div className="w-16 h-16 bg-emerald-500/10 rounded-full flex items-center justify-center text-emerald-400">
+                            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
+                        </div>
                     </div>
-                    <h2 className="text-2xl font-bold text-slate-800 mb-2">¡Registro Exitoso!</h2>
-                    <p className="text-slate-600 mb-8 text-sm">
-                        Hemos creado tu cuenta. Verifícala si es necesario o inicia sesión.
+                    <h2 className="text-xl font-bold text-white mb-2">Cuenta Creada</h2>
+                    <p className="text-slate-400 mb-8 text-sm leading-relaxed">
+                        Te hemos enviado un correo de confirmación. Por favor verifícalo para continuar.
                     </p>
-                    <Link href="/login" className="btn-primary w-full py-3 justify-center">
+                    <Link href="/login" className="btn-primary w-full block text-center">
                         Ir a Iniciar Sesión
                     </Link>
                 </div>
@@ -48,39 +50,39 @@ export default function SignupPage() {
     }
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-slate-100 p-4">
-            <div className="bg-white p-10 rounded-2xl shadow-xl w-full max-w-sm border border-slate-100">
-                <div className="text-center mb-8">
-                    <h1 className="text-3xl font-bold text-slate-800 tracking-tight">Crear Cuenta</h1>
+        <div className="min-h-screen flex items-center justify-center bg-slate-950 p-4">
+            <div className="w-full max-w-sm">
+                <div className="text-center mb-10">
+                    <h1 className="text-2xl font-bold text-white tracking-tight">Crear Cuenta</h1>
                     <p className="text-slate-500 text-sm mt-2">Únete a Sinapsia Poli</p>
                 </div>
 
                 {error && (
-                    <div className="bg-red-50 border-l-4 border-red-500 text-red-700 p-4 rounded mb-6 text-sm">
+                    <div className="bg-red-500/10 border border-red-500/20 text-red-400 p-3 rounded-md mb-6 text-sm text-center">
                         {error}
                     </div>
                 )}
 
-                <form onSubmit={handleSignup} className="space-y-5">
-                    <div>
-                        <label className="block text-slate-700 text-sm font-semibold mb-2">Correo Electrónico</label>
+                <form onSubmit={handleSignup} className="space-y-4">
+                    <div className="space-y-1">
+                        <label className="text-slate-400 text-xs font-medium uppercase tracking-wider ml-1">Email</label>
                         <input
                             type="email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             className="input-premium"
-                            placeholder="nombre@ejemplo.com"
+                            placeholder="usuario@sinapsia.com"
                             required
                         />
                     </div>
-                    <div>
-                        <label className="block text-slate-700 text-sm font-semibold mb-2">Contraseña</label>
+                    <div className="space-y-1">
+                        <label className="text-slate-400 text-xs font-medium uppercase tracking-wider ml-1">Contraseña</label>
                         <input
                             type="password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             className="input-premium"
-                            placeholder="••••••••"
+                            placeholder="Mínimo 6 caracteres"
                             required
                             minLength={6}
                         />
@@ -89,14 +91,16 @@ export default function SignupPage() {
                     <button
                         type="submit"
                         disabled={loading}
-                        className="w-full btn-primary py-3 text-lg"
+                        className="w-full btn-primary py-2.5 mt-4"
                     >
-                        {loading ? 'Registrando...' : 'Registrarse'}
+                        {loading ? 'Creando...' : 'Registrarse ->'}
                     </button>
                 </form>
 
                 <p className="mt-8 text-center text-sm text-slate-600">
-                    ¿Ya tienes cuenta? <Link href="/login" className="text-indigo-600 font-semibold hover:text-indigo-700 transition">Inicia Sesión</Link>
+                    <Link href="/login" className="hover:text-indigo-400 transition-colors duration-200">
+                        Ya tengo una cuenta
+                    </Link>
                 </p>
             </div>
         </div>

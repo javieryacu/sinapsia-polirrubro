@@ -3,25 +3,16 @@ import Link from 'next/link'
 
 export default function NewProductPage() {
     return (
-        <div className="min-h-screen bg-slate-50 py-10 px-4">
-            <div className="max-w-7xl mx-auto">
-                <div className="mb-8 flex items-center gap-4">
-                    <Link href="/inventory" className="text-indigo-600 hover:text-indigo-800 transition font-medium flex items-center gap-1">
-                        ← Volver al Inventario
-                    </Link>
-                </div>
+        <div className="min-h-screen bg-slate-950 py-12 px-4">
+            <div className="max-w-2xl mx-auto mb-8">
+                <Link href="/inventory" className="text-slate-500 hover:text-slate-300 transition-colors text-sm font-medium flex items-center gap-1 mb-6">
+                    ← Volver al Inventario
+                </Link>
 
-                <div className="text-center mb-10">
-                    <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">Agregar Nuevo Producto</h1>
-                    <p className="text-slate-500 mt-2">Amplía tu catálogo registrando nuevos artículos.</p>
-                </div>
-
-                <div className="flex justify-center">
-                    <div className="w-full max-w-3xl">
-                        <ProductForm />
-                    </div>
-                </div>
+                <h1 className="text-2xl font-bold text-white tracking-tight">Nuevo Producto</h1>
             </div>
+
+            <ProductForm />
         </div>
     )
 }

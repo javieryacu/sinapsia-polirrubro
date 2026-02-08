@@ -1,90 +1,87 @@
 @import "tailwindcss";
 
 :root {
-  /* Slate-50 as background, Slate-900 as foreground */
-  --background: #f8fafc; 
-  --foreground: #0f172a;
-  
-  /* Indigo-600 */
-  --primary: #4f46e5;
-  --primary-foreground: #ffffff;
-  
-  /* Slate-200 */
-  --border: #e2e8f0;
-  
-  /* White */
-  --card: #ffffff;
-  --card-foreground: #0f172a;
-}
+  /* Linear-like Navy Theme */
+  --background: #0f172a;
+  /* Slate 900 */
+  --foreground: #f8fafc;
+  /* Slate 50 */
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-border: var(--border);
-  --color-card: var(--card);
-  --color-card-foreground: var(--card-foreground);
-  
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  --primary: #6366f1;
+  /* Indigo 500 */
+  --primary-hover: #4f46e5;
+  /* Indigo 600 */
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    /* Slate-950 */
-    --background: #020617;
-    --foreground: #f8fafc;
-    
-    /* Indigo-500 */
-    --primary: #6366f1;
-    --primary-foreground: #ffffff;
-    
-    /* Slate-800 */
-    --border: #1e293b;
-    
-    /* Slate-900 */
-    --card: #0f172a;
-    --card-foreground: #f8fafc;
-  }
+  --surface: #1e293b;
+  /* Slate 800 */
+  --surface-hover: #334155;
+  /* Slate 700 */
+
+  --border: #334155;
+  /* Slate 700 */
+  --border-light: #475569;
+  /* Slate 600 */
+
+  --text-secondary: #94a3b8;
+  /* Slate 400 */
+  --text-tertiary: #64748b;
+  /* Slate 500 */
+
+  --success: #10b981;
+  /* Emerald 500 */
+  --danger: #ef4444;
+  /* Red 500 */
+  --warning: #f59e0b;
+  /* Amber 500 */
 }
 
 body {
-  background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-sans), system-ui, sans-serif;
-  -webkit-font-smoothing: antialiased;
+  background: var(--background);
+  font-family: var(--font-geist-sans), "Inter", sans-serif;
+  antialiased;
 }
 
-/* Premium Utilities */
+/* Utilities for Linear Style */
 @layer components {
   .btn-primary {
-    @apply bg-primary text-primary-foreground px-4 py-2 rounded-lg font-medium 
-           hover:opacity-90 transition-all duration-200 active:scale-95 shadow-md shadow-primary/20
-           flex items-center justify-center gap-2;
+    @apply bg-indigo-500 text-white px-4 py-2 rounded-md font-medium hover:bg-indigo-600 transition-all duration-200 ease-out active:scale-95 disabled:opacity-50 disabled:pointer-events-none shadow-sm shadow-indigo-500/20;
   }
 
   .btn-secondary {
-    @apply bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-border 
-           px-4 py-2 rounded-lg font-medium hover:bg-slate-50 dark:hover:bg-slate-700 
-           transition-all duration-200 flex items-center justify-center gap-2;
+    @apply bg-slate-800 text-slate-200 px-4 py-2 rounded-md font-medium hover:bg-slate-700 border border-slate-700 transition-all duration-200 ease-out active:scale-95 disabled:opacity-50;
+  }
+
+  .btn-danger {
+    @apply bg-red-500/10 text-red-400 px-4 py-2 rounded-md font-medium hover:bg-red-500/20 border border-red-500/20 transition-all duration-200 ease-out active:scale-95;
+  }
+
+  .input-premium {
+    @apply w-full bg-slate-800 border border-slate-700 text-slate-100 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all duration-200 placeholder-slate-500;
   }
 
   .card {
-    @apply bg-card text-card-foreground p-6 rounded-xl border border-border shadow-sm;
-  }
-  
-  .input-premium {
-    @apply w-full px-4 py-2 rounded-lg border border-border bg-background 
-           focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary 
-           transition-all duration-200;
+    @apply bg-slate-800 border border-slate-700/50 rounded-xl shadow-xl shadow-black/20;
   }
 
   .page-container {
-    @apply min-h-screen bg-background p-4 md:p-8;
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8;
   }
-  
-  .heading-1 {
-    @apply text-3xl font-bold tracking-tight text-foreground mb-6;
+}
+
+/* Animations */
+@keyframes pulse-subtle {
+
+  0%,
+  100% {
+    opacity: 1;
   }
+
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.animate-pulse-subtle {
+  animation: pulse-subtle 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }

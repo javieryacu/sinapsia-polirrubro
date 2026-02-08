@@ -22,40 +22,41 @@ export default function LoginPage() {
             // Use window.location.href to force a full reload and ensure middleware picks up the new session cookie
             window.location.href = '/'
         } catch (err: any) {
-            setError(err.message || 'Error al iniciar sesión')
+            setError(err.message || 'Credenciales incorrectas')
         } finally {
             setLoading(false)
         }
     }
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-slate-100 p-4">
-            <div className="bg-white p-10 rounded-2xl shadow-xl w-full max-w-sm border border-slate-100">
-                <div className="text-center mb-8">
-                    <h1 className="text-3xl font-bold text-slate-800 tracking-tight">Bienvenido</h1>
-                    <p className="text-slate-500 text-sm mt-2">Inicia sesión en Sinapsia Poli</p>
+        <div className="min-h-screen flex items-center justify-center bg-slate-950 p-4">
+            <div className="w-full max-w-sm">
+                <div className="text-center mb-10">
+                    <h1 className="text-2xl font-bold text-white tracking-tight">Iniciar Sesión</h1>
+                    <p className="text-slate-500 text-sm mt-2">Bienvenido de nuevo a Sinapsia</p>
                 </div>
 
                 {error && (
-                    <div className="bg-red-50 border-l-4 border-red-500 text-red-700 p-4 rounded mb-6 text-sm">
+                    <div className="bg-red-500/10 border border-red-500/20 text-red-400 p-3 rounded-md mb-6 text-sm text-center">
                         {error}
                     </div>
                 )}
 
-                <form onSubmit={handleLogin} className="space-y-5">
-                    <div>
-                        <label className="block text-slate-700 text-sm font-semibold mb-2">Correo Electrónico</label>
+                <form onSubmit={handleLogin} className="space-y-4">
+                    <div className="space-y-1">
+                        <label className="text-slate-400 text-xs font-medium uppercase tracking-wider ml-1">Email</label>
                         <input
                             type="email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             className="input-premium"
-                            placeholder="nombre@ejemplo.com"
+                            placeholder="usuario@sinapsia.com"
+                            autoFocus
                             required
                         />
                     </div>
-                    <div>
-                        <label className="block text-slate-700 text-sm font-semibold mb-2">Contraseña</label>
+                    <div className="space-y-1">
+                        <label className="text-slate-400 text-xs font-medium uppercase tracking-wider ml-1">Contraseña</label>
                         <input
                             type="password"
                             value={password}
@@ -69,14 +70,16 @@ export default function LoginPage() {
                     <button
                         type="submit"
                         disabled={loading}
-                        className="w-full btn-primary py-3 text-lg"
+                        className="w-full btn-primary py-2.5 mt-4"
                     >
-                        {loading ? 'Ingresando...' : 'Iniciar Sesión'}
+                        {loading ? 'Verificando...' : 'Entrar ->'}
                     </button>
                 </form>
 
                 <p className="mt-8 text-center text-sm text-slate-600">
-                    ¿No tienes cuenta? <Link href="/signup" className="text-indigo-600 font-semibold hover:text-indigo-700 transition">Regístrate</Link>
+                    <Link href="/signup" className="hover:text-indigo-400 transition-colors duration-200">
+                        Crear una cuenta nueva
+                    </Link>
                 </p>
             </div>
         </div>

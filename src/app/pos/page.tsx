@@ -1,34 +1,31 @@
 'use client'
 
-import { useEffect, useState, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { getProducts } from '@/services/productService'
-import { useCartStore } from '@/store/cartStore'
-import { Database } from '@/types/database.types'
 import { createSale } from '@/services/saleService'
+import { Database } from '@/types/database.types'
+import { useRouter } from 'next/navigation'
+import Link from 'next/link'
+import useCartStore from '@/store/cartStore'
 
 type Product = Database['public']['Tables']['products']['Row']
 
 export default function POSPage() {
+    const router = useRouter()
+    const { items, addItem, removeItem, clearCart, total } = useCartStore()
     const [products, setProducts] = useState<Product[]>([])
-    const [filteredProducts, setFilteredProducts] = useState<Product[]>([])
     const [searchTerm, setSearchTerm] = useState('')
+    const [isCheckoutModalOpen, setIsCheckoutModalOpen] = useState(false)
+    const [paymentMethod, setPaymentMethod] = useState<'CASH' | 'DEBIT' | 'CREDIT' | 'TRANSFER' | 'OTHER'>('CASH')
     const [isLoading, setIsLoading] = useState(true)
-    const [showCheckoutModal, setShowCheckoutModal] = useState(false)
-    const [processing, setProcessing] = useState(false)
-
-    // Focus ref for search input
-    const searchInputRef = useRef<HTMLInputElement>(null)
-
-    const cart = useCartStore()
 
     useEffect(() => {
         const fetchProducts = async () => {
             try {
                 const data = await getProducts()
                 setProducts(data || [])
-                setFilteredProducts(data || [])
             } catch (error) {
-                console.error('Failed to load products', error)
+                console.error('Error fetching products:', error)
             } finally {
                 setIsLoading(false)
             }
@@ -36,152 +33,119 @@ export default function POSPage() {
         fetchProducts()
     }, [])
 
-    useEffect(() => {
-        if (!searchTerm) {
-            setFilteredProducts(products)
-            return
-        }
-        const lower = searchTerm.toLowerCase()
-        const results = products.filter(p =>
-            p.name.toLowerCase().includes(lower) ||
-            p.barcode?.toLowerCase().includes(lower)
-        )
-        setFilteredProducts(results)
-    }, [searchTerm, products])
+    const filteredProducts = products.filter(product =>
+        product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        product.barcode?.toLowerCase().includes(searchTerm.toLowerCase())
+    )
 
-    const handleAddToCart = (product: Product) => {
-        cart.addItem(product)
-        setSearchTerm('')
-        // Optionally keep focus or let user browse
-        searchInputRef.current?.focus()
-    }
+    const handleCheckout = async () => {
+        if (items.length === 0) return
 
-    const handleConfirmSale = async () => {
-        setProcessing(true)
         try {
-            const saleItems = cart.items.map(item => ({
-                product_id: item.id,
-                quantity: item.quantity,
-                price: item.sale_price
-            }))
-
-            await createSale(saleItems, cart.total, 'CASH')
-
-            cart.clearCart()
-            setShowCheckoutModal(false)
-            // Ideally use a toast here
-            alert('¡Venta Exitosa!')
+            await createSale({
+                total_amount: total(),
+                payment_method: paymentMethod,
+                items: items.map(item => ({
+                    product_id: item.id,
+                    quantity: item.quantity,
+                    unit_price: item.price,
+                    subtotal: item.price * item.quantity
+                }))
+            })
+            clearCart()
+            setIsCheckoutModalOpen(false)
+            alert('Venta realizada con éxito') // Replace with a nice toast later
         } catch (error) {
-            console.error(error)
-            alert('Error al procesar la venta.')
-        } finally {
-            setProcessing(false)
+            console.error('Error processing sale:', error)
+            alert('Error al procesar la venta')
         }
     }
 
     return (
-        <div className="flex h-screen bg-slate-100 overflow-hidden font-sans text-slate-900">
-            {/* LEFT: Product Grid & Search (70%) */}
-            <div className="w-[70%] flex flex-col p-6 border-r border-slate-200">
-
-                {/* Header & Search */}
-                <div className="flex justify-between items-center mb-6">
-                    <h1 className="text-2xl font-extrabold text-slate-800 tracking-tight">
-                        Punto de Venta
-                    </h1>
-                    <div className="w-1/2 relative">
+        <div className="flex h-screen bg-slate-950 overflow-hidden font-sans text-slate-200">
+            {/* Left Panel: Product Grid */}
+            <div className="flex-1 flex flex-col border-r border-slate-800">
+                {/* Header / Search */}
+                <div className="p-4 border-b border-slate-800 bg-slate-900/50 flex gap-4 items-center">
+                    <Link href="/" className="btn-secondary px-3 py-2 text-sm">
+                        Inicio
+                    </Link>
+                    <div className="relative flex-1">
+                        <svg className="w-5 h-5 absolute left-3 top-2.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                         <input
-                            ref={searchInputRef}
-                            autoFocus
                             type="text"
-                            placeholder="Buscar productos (Nombre, Código)..."
-                            className="input-premium pl-10"
+                            placeholder="Buscar productos (Código o Nombre)..."
+                            className="input-premium pl-10 h-10 bg-slate-800"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
+                            autoFocus
                         />
-                        <svg className="w-5 h-5 absolute left-3 top-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                     </div>
                 </div>
 
-                {/* Product Grid */}
-                <div className="flex-1 overflow-y-auto pr-2">
+                {/* Grid */}
+                <div className="flex-1 overflow-y-auto p-4">
                     {isLoading ? (
-                        <div className="flex items-center justify-center h-40">
-                            <span className="text-slate-400">Cargando catálogo...</span>
-                        </div>
-                    ) : filteredProducts.length === 0 ? (
-                        <div className="flex flex-col items-center justify-center h-64 text-slate-400">
-                            <svg className="w-12 h-12 mb-2 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
-                            <p>No se encontraron productos.</p>
+                        <div className="flex justify-center items-center h-full text-slate-500">
+                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-500"></div>
                         </div>
                     ) : (
-                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 pb-20">
+                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                             {filteredProducts.map(product => (
-                                <div
+                                <button
                                     key={product.id}
-                                    onClick={() => handleAddToCart(product)}
-                                    className="group bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-md hover:border-indigo-300 transition-all cursor-pointer flex flex-col overflow-hidden active:scale-95"
+                                    onClick={() => addItem({ id: product.id, name: product.name, price: product.sale_price, quantity: 1 })}
+                                    className="bg-slate-800 border border-slate-700/50 hover:border-indigo-500/50 hover:bg-slate-750 rounded-xl p-4 flex flex-col justify-between h-32 transition-all duration-150 active:scale-95 text-left group shadow-lg"
                                 >
-                                    {/* Placeholder Image Area */}
-                                    <div className="h-32 bg-slate-50 flex items-center justify-center group-hover:bg-indigo-50/30 transition-colors">
-                                        {/* If we had images, <img /> goes here */}
-                                        <span className="text-4xl">📦</span>
-                                    </div>
-
-                                    <div className="p-4 flex flex-col flex-1">
-                                        <h3 className="font-semibold text-slate-800 text-sm mb-1 line-clamp-2">
+                                    <div>
+                                        <h3 className="font-semibold text-slate-200 text-sm leading-tight line-clamp-2 group-hover:text-indigo-300 transition-colors">
                                             {product.name}
                                         </h3>
-                                        <p className="text-xs text-slate-500 mb-3">
-                                            Cod: {product.barcode || 'N/A'}
+                                        <p className="text-xs text-slate-500 mt-1 font-mono">
+                                            {product.barcode || '---'}
                                         </p>
-                                        <div className="mt-auto flex justify-between items-center">
-                                            <span className="text-lg font-bold text-indigo-600">
-                                                ${product.sale_price}
-                                            </span>
-                                            <span className="text-xs bg-slate-100 text-slate-600 px-2 py-1 rounded-full">
-                                                Stock: {product.stock}
-                                            </span>
-                                        </div>
                                     </div>
-                                </div>
+                                    <div className="text-right">
+                                        <span className="font-bold text-lg text-emerald-400">
+                                            ${product.sale_price}
+                                        </span>
+                                    </div>
+                                </button>
                             ))}
                         </div>
                     )}
                 </div>
             </div>
 
-            {/* RIGHT: Cart Panel (30%) */}
-            <div className="w-[30%] bg-white flex flex-col shadow-xl z-10">
-                <div className="p-6 bg-slate-50 border-b border-slate-200">
-                    <h2 className="text-xl font-bold text-slate-800 flex items-center gap-2">
-                        <span>🛒</span> Carrito Actual
-                    </h2>
+            {/* Right Panel: Cart */}
+            <div className="w-96 bg-slate-900 flex flex-col border-l border-slate-800 shadow-2xl">
+                <div className="p-5 border-b border-slate-800 bg-slate-900">
+                    <h2 className="text-lg font-bold text-white tracking-tight">Orden Actual</h2>
+                    <p className="text-slate-500 text-xs mt-1">Ticket #000-000</p>
                 </div>
 
-                {/* Cart Items */}
                 <div className="flex-1 overflow-y-auto p-4 space-y-3">
-                    {cart.items.length === 0 ? (
-                        <div className="text-center text-slate-400 mt-10">
-                            <p className="mb-2">El carrito está vacío</p>
-                            <p className="text-sm">Selecciona productos del panel izquierdo.</p>
+                    {items.length === 0 ? (
+                        <div className="h-full flex flex-col items-center justify-center text-slate-600 space-y-4 opacity-50">
+                            <svg className="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
+                            <p className="text-sm">El carrito está vacío</p>
                         </div>
                     ) : (
-                        cart.items.map(item => (
-                            <div key={item.id} className="flex items-center justify-between bg-white p-3 rounded-lg border border-slate-100 shadow-sm">
-                                <div className="flex-1">
-                                    <h4 className="font-medium text-slate-800 text-sm line-clamp-1">{item.name}</h4>
-                                    <div className="text-xs text-slate-500 mt-1">
-                                        ${item.sale_price} x {item.quantity}
+                        items.map(item => (
+                            <div key={item.id} className="flex justify-between items-center bg-slate-800/50 p-3 rounded-lg border border-slate-800 hover:border-slate-700 transition-colors">
+                                <div className="flex-1 min-w-0 pr-4">
+                                    <h4 className="text-sm font-medium text-slate-200 truncate">{item.name}</h4>
+                                    <div className="text-xs text-slate-500 mt-0.5">
+                                        {item.quantity} x ${item.price}
                                     </div>
                                 </div>
-                                <div className="flex items-center gap-3">
-                                    <span className="font-bold text-slate-900">
-                                        ${item.subtotal}
+                                <div className="text-right flex items-center gap-3">
+                                    <span className="font-bold text-slate-300 text-sm">
+                                        ${item.price * item.quantity}
                                     </span>
                                     <button
-                                        onClick={() => cart.removeItem(item.id)}
-                                        className="text-slate-400 hover:text-red-500 transition-colors p-1"
+                                        onClick={() => removeItem(item.id)}
+                                        className="text-slate-600 hover:text-red-400 transition-colors p-1"
                                     >
                                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                                     </button>
@@ -191,58 +155,76 @@ export default function POSPage() {
                     )}
                 </div>
 
-                {/* Footer / Totals */}
-                <div className="p-6 bg-slate-50 border-t border-slate-200">
-                    <div className="flex justify-between items-end mb-4">
-                        <span className="text-slate-500 text-sm font-medium">Total a Pagar</span>
-                        <span className="text-3xl font-extrabold text-indigo-700">
-                            ${cart.total}
-                        </span>
+                {/* Totals Section */}
+                <div className="p-6 bg-slate-900 border-t border-slate-800 space-y-4">
+                    <div className="flex justify-between items-center text-slate-400 text-sm">
+                        <span>Items</span>
+                        <span>{items.reduce((acc, item) => acc + item.quantity, 0)}</span>
+                    </div>
+                    <div className="flex justify-between items-center pt-2">
+                        <span className="text-xl font-bold text-white">Total</span>
+                        <span className="text-3xl font-bold text-emerald-400">${total()}</span>
                     </div>
 
                     <button
-                        onClick={() => setShowCheckoutModal(true)}
-                        disabled={cart.items.length === 0}
-                        className="w-full btn-primary py-4 text-lg shadow-indigo-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                        onClick={() => items.length > 0 && setIsCheckoutModalOpen(true)}
+                        disabled={items.length === 0}
+                        className="w-full btn-primary py-4 text-lg font-bold shadow-lg shadow-indigo-900/20 mt-4 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                        PROCESAR COMPRA
+                        Cobrar (F5)
                     </button>
                 </div>
             </div>
 
-            {/* CHECKOUT MODAL */}
-            {showCheckoutModal && (
-                <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-                    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8 transform transition-all scale-100">
-                        <div className="text-center mb-6">
-                            <h3 className="text-2xl font-bold text-slate-800">Confirmar Pago</h3>
-                            <p className="text-slate-500">Resumen de la transacción</p>
+            {/* Checkout Modal */}
+            {isCheckoutModalOpen && (
+                <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+                    <div className="bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden transform transition-all animate-pulse-subtle">
+                        <div className="bg-slate-800 px-6 py-4 flex justify-between items-center border-b border-slate-700">
+                            <h3 className="text-lg font-bold text-white">Confirmar Venta</h3>
+                            <button onClick={() => setIsCheckoutModalOpen(false)} className="text-slate-400 hover:text-white">✕</button>
                         </div>
 
-                        <div className="bg-slate-50 rounded-xl p-6 mb-6">
-                            <div className="flex justify-between mb-2">
-                                <span className="text-slate-600">Total</span>
-                                <span className="font-bold text-lg text-slate-800">${cart.total}</span>
+                        <div className="p-6 space-y-6">
+                            <div className="text-center">
+                                <p className="text-slate-400 text-sm mb-1">Monto Total</p>
+                                <p className="text-4xl font-bold text-white">${total()}</p>
                             </div>
-                            <div className="flex justify-between">
-                                <span className="text-slate-600">Método</span>
-                                <span className="font-medium text-slate-800">Efectivo</span>
+
+                            <div className="space-y-3">
+                                <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider block">Método de Pago</label>
+                                <div className="grid grid-cols-2 gap-3">
+                                    {(['CASH', 'DEBIT', 'CREDIT', 'TRANSFER', 'OTHER'] as const).map(method => (
+                                        <button
+                                            key={method}
+                                            onClick={() => setPaymentMethod(method)}
+                                            className={`py-3 px-4 rounded-lg text-sm font-medium border transition-all ${paymentMethod === method
+                                                    ? 'bg-indigo-600 text-white border-indigo-500 ring-2 ring-indigo-500/20'
+                                                    : 'bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700'
+                                                }`}
+                                        >
+                                            {method === 'CASH' ? 'Efectivo' :
+                                                method === 'DEBIT' ? 'Débito' :
+                                                    method === 'CREDIT' ? 'Crédito' :
+                                                        method === 'TRANSFER' ? 'Transferencia' : 'Otro'}
+                                        </button>
+                                    ))}
+                                </div>
                             </div>
                         </div>
 
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="p-6 pt-0 flex gap-3">
                             <button
-                                onClick={() => setShowCheckoutModal(false)}
-                                className="btn-secondary py-3"
+                                onClick={() => setIsCheckoutModalOpen(false)}
+                                className="flex-1 btn-secondary"
                             >
                                 Cancelar
                             </button>
                             <button
-                                onClick={handleConfirmSale}
-                                disabled={processing}
-                                className="btn-primary py-3 bg-green-600 hover:bg-green-700 shadow-green-200"
+                                onClick={handleCheckout}
+                                className="flex-1 btn-primary"
                             >
-                                {processing ? 'Procesando...' : 'Confirmar'}
+                                Confirmar y Cobrar
                             </button>
                         </div>
                     </div>
