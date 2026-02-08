@@ -28,34 +28,39 @@ export default function LoginPage() {
     }
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-100">
-            <div className="bg-white p-8 rounded-lg shadow-md w-96">
-                <h1 className="text-2xl font-bold mb-6 text-center text-indigo-700">Iniciar Sesión</h1>
+        <div className="min-h-screen flex items-center justify-center bg-slate-100 p-4">
+            <div className="bg-white p-10 rounded-2xl shadow-xl w-full max-w-sm border border-slate-100">
+                <div className="text-center mb-8">
+                    <h1 className="text-3xl font-bold text-slate-800 tracking-tight">Bienvenido</h1>
+                    <p className="text-slate-500 text-sm mt-2">Inicia sesión en Sinapsia Poli</p>
+                </div>
 
                 {error && (
-                    <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+                    <div className="bg-red-50 border-l-4 border-red-500 text-red-700 p-4 rounded mb-6 text-sm">
                         {error}
                     </div>
                 )}
 
-                <form onSubmit={handleLogin} className="space-y-4">
+                <form onSubmit={handleLogin} className="space-y-5">
                     <div>
-                        <label className="block text-gray-700 text-sm font-bold mb-2">Email</label>
+                        <label className="block text-slate-700 text-sm font-semibold mb-2">Correo Electrónico</label>
                         <input
                             type="email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                            className="w-full p-2 border rounded focus:ring-indigo-500 focus:border-indigo-500"
+                            className="input-premium"
+                            placeholder="nombre@ejemplo.com"
                             required
                         />
                     </div>
                     <div>
-                        <label className="block text-gray-700 text-sm font-bold mb-2">Contraseña</label>
+                        <label className="block text-slate-700 text-sm font-semibold mb-2">Contraseña</label>
                         <input
                             type="password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            className="w-full p-2 border rounded focus:ring-indigo-500 focus:border-indigo-500"
+                            className="input-premium"
+                            placeholder="••••••••"
                             required
                         />
                     </div>
@@ -63,14 +68,14 @@ export default function LoginPage() {
                     <button
                         type="submit"
                         disabled={loading}
-                        className="w-full bg-indigo-600 text-white py-2 rounded hover:bg-indigo-700 disabled:opacity-50 transition"
+                        className="w-full btn-primary py-3 text-lg"
                     >
-                        {loading ? 'Cargando...' : 'Entrar'}
+                        {loading ? 'Ingresando...' : 'Iniciar Sesión'}
                     </button>
                 </form>
 
-                <p className="mt-4 text-center text-sm text-gray-600">
-                    ¿No tienes cuenta? <Link href="/signup" className="text-indigo-600 hover:underline">Regístrate</Link>
+                <p className="mt-8 text-center text-sm text-slate-600">
+                    ¿No tienes cuenta? <Link href="/signup" className="text-indigo-600 font-semibold hover:text-indigo-700 transition">Regístrate</Link>
                 </p>
             </div>
         </div>
