@@ -22,3 +22,16 @@ export const createProduct = async (product: ProductInsert) => {
 
     return data
 }
+
+export const getProducts = async () => {
+    const { data, error } = await supabase
+        .from('products')
+        .select('*')
+        .order('name')
+
+    if (error) {
+        throw new Error(error.message)
+    }
+
+    return data
+}

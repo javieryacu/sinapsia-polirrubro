@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { createProduct } from './productService'
+import { createProduct, getProducts } from './productService'
 import { supabase } from '@/lib/supabase'
 
 // Mock Supabase client
@@ -60,5 +60,25 @@ describe('ProductService', () => {
         }
 
         await expect(createProduct(invalidProduct)).rejects.toThrow('Price cannot be negative')
+    })
+})
+
+describe('ProductService - getProducts', () => {
+    it('should return a list of products', async () => {
+        const mockProducts = [
+            { id: '1', name: 'Prod A', sale_price: 100, stock: 5 },
+            { id: '2', name: 'Prod B', sale_price: 200, stock: 10 }
+        ]
+
+        const selectMock = vi.fn().mockReturnValue({
+            order: vi.fn().mockResolvedValue({ data: mockProducts, error: null })
+        })
+
+        // @ts-ignore
+        supabase.from.mockReturnValue({ select: selectMock })
+
+        const result = await getProducts()
+        expect(result).toEqual(mockProducts)
+        expect(supabase.from).toHaveBeenCalledWith('products')
     })
 })
