@@ -5,6 +5,7 @@ export interface SaleItemInput {
     product_id: string
     quantity: number
     price: number
+    cost_price: number
 }
 
 import { Database } from '@/types/database.types'
@@ -27,6 +28,7 @@ export const createSale = async (items: SaleItemInput[], total: number, paymentM
         product_id: item.product_id,
         quantity: item.quantity,
         unit_price: item.price,
+        cost_price: item.cost_price,
         subtotal: item.quantity * item.price
     }))
 

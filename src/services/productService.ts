@@ -9,6 +9,9 @@ export const createProduct = async (product: ProductInsert) => {
     if (product.sale_price !== undefined && product.sale_price < 0) {
         throw new Error('Price cannot be negative')
     }
+    if (product.cost_price !== undefined && product.cost_price < 0) {
+        throw new Error('Cost price cannot be negative')
+    }
 
     // 2. Insert to DB
     const { data, error } = await supabase

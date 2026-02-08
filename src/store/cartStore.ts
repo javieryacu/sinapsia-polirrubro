@@ -4,6 +4,7 @@ export interface CartItem {
     id: string
     name: string
     sale_price: number
+    cost_price: number
     stock: number
     quantity: number
     subtotal: number
@@ -12,7 +13,7 @@ export interface CartItem {
 interface CartState {
     items: CartItem[]
     total: number
-    addItem: (product: { id: string, name: string, sale_price: number, stock: number }) => void
+    addItem: (product: { id: string, name: string, sale_price: number, cost_price: number, stock: number }) => void
     removeItem: (productId: string) => void
     clearCart: () => void
 }

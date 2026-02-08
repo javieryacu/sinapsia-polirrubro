@@ -1,16 +1,34 @@
+'use client'
+
 import Link from 'next/link'
+import { useEffect, useState } from 'react'
+import { supabase } from '@/lib/supabase'
 
 export default function Home() {
+  const [metrics, setMetrics] = useState({
+    total_sales: 0,
+    total_cost: 0,
+    net_profit: 0,
+    transaction_count: 0
+  })
+
+  useEffect(() => {
+    const fetchMetrics = async () => {
+      const { data, error } = await supabase.rpc('get_daily_measures')
+      if (data) setMetrics(data as any)
+    }
+    fetchMetrics()
+  }, [])
+
   return (
     <div className="min-h-screen bg-slate-900 flex flex-col items-center justify-center p-6 relative overflow-hidden">
-      {/* Background Decor - Subtle & Deep */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
         <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-indigo-500/10 rounded-full blur-3xl"></div>
         <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-500/10 rounded-full blur-3xl"></div>
       </div>
 
-      <main className="max-w-4xl w-full text-center space-y-12 relative z-10">
-        <div className="mb-12">
+      <main className="max-w-4xl w-full space-y-12 relative z-10">
+        <div className="text-center mb-12">
           <h1 className="text-5xl font-bold tracking-tight text-white mb-4">
             Sinapsia <span className="text-indigo-400">Polirrubro</span>
           </h1>
@@ -56,11 +74,11 @@ export default function Home() {
             </p>
           </Link>
         </div>
-      </main>
+      </main >
 
       <footer className="mt-20 text-slate-600 text-xs font-mono uppercase tracking-wider">
         v0.1.0 • Antigravity System
       </footer>
-    </div>
+    </div >
   )
 }

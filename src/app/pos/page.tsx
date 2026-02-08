@@ -46,7 +46,8 @@ export default function POSPage() {
                 items.map(item => ({
                     product_id: item.id,
                     quantity: item.quantity,
-                    price: item.sale_price
+                    price: item.sale_price,
+                    cost_price: item.cost_price
                 })),
                 total,
                 paymentMethod
@@ -93,7 +94,13 @@ export default function POSPage() {
                             {filteredProducts.map(product => (
                                 <button
                                     key={product.id}
-                                    onClick={() => addItem({ id: product.id, name: product.name, sale_price: product.sale_price, stock: product.stock || 0 })}
+                                    onClick={() => addItem({
+                                        id: product.id,
+                                        name: product.name,
+                                        sale_price: product.sale_price,
+                                        cost_price: product.cost_price || 0,
+                                        stock: product.stock || 0
+                                    })}
                                     className="bg-slate-800 border border-slate-700/50 hover:border-indigo-500/50 hover:bg-slate-750 rounded-xl p-4 flex flex-col justify-between h-32 transition-all duration-150 active:scale-95 text-left group shadow-lg"
                                 >
                                     <div>
