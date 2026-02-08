@@ -6,7 +6,7 @@ import { createSale } from '@/services/saleService'
 import { Database } from '@/types/database.types'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import useCartStore from '@/store/cartStore'
+import { useCartStore } from '@/store/cartStore'
 
 type Product = Database['public']['Tables']['products']['Row']
 
@@ -42,16 +42,15 @@ export default function POSPage() {
         if (items.length === 0) return
 
         try {
-            await createSale({
-                total_amount: total(),
-                payment_method: paymentMethod,
-                items: items.map(item => ({
+            await createSale(
+                items.map(item => ({
                     product_id: item.id,
                     quantity: item.quantity,
-                    unit_price: item.price,
-                    subtotal: item.price * item.quantity
-                }))
-            })
+                    price: item.sale_price
+                })),
+                total,
+                paymentMethod
+            )
             clearCart()
             setIsCheckoutModalOpen(false)
             alert('Venta realizada con éxito') // Replace with a nice toast later
@@ -94,7 +93,7 @@ export default function POSPage() {
                             {filteredProducts.map(product => (
                                 <button
                                     key={product.id}
-                                    onClick={() => addItem({ id: product.id, name: product.name, price: product.sale_price, quantity: 1 })}
+                                    onClick={() => addItem({ id: product.id, name: product.name, sale_price: product.sale_price, stock: product.stock || 0 })}
                                     className="bg-slate-800 border border-slate-700/50 hover:border-indigo-500/50 hover:bg-slate-750 rounded-xl p-4 flex flex-col justify-between h-32 transition-all duration-150 active:scale-95 text-left group shadow-lg"
                                 >
                                     <div>
@@ -136,12 +135,12 @@ export default function POSPage() {
                                 <div className="flex-1 min-w-0 pr-4">
                                     <h4 className="text-sm font-medium text-slate-200 truncate">{item.name}</h4>
                                     <div className="text-xs text-slate-500 mt-0.5">
-                                        {item.quantity} x ${item.price}
+                                        {item.quantity} x ${item.sale_price}
                                     </div>
                                 </div>
                                 <div className="text-right flex items-center gap-3">
                                     <span className="font-bold text-slate-300 text-sm">
-                                        ${item.price * item.quantity}
+                                        ${item.sale_price * item.quantity}
                                     </span>
                                     <button
                                         onClick={() => removeItem(item.id)}
@@ -163,7 +162,7 @@ export default function POSPage() {
                     </div>
                     <div className="flex justify-between items-center pt-2">
                         <span className="text-xl font-bold text-white">Total</span>
-                        <span className="text-3xl font-bold text-emerald-400">${total()}</span>
+                        <span className="text-3xl font-bold text-emerald-400">${total}</span>
                     </div>
 
                     <button
@@ -188,7 +187,7 @@ export default function POSPage() {
                         <div className="p-6 space-y-6">
                             <div className="text-center">
                                 <p className="text-slate-400 text-sm mb-1">Monto Total</p>
-                                <p className="text-4xl font-bold text-white">${total()}</p>
+                                <p className="text-4xl font-bold text-white">${total}</p>
                             </div>
 
                             <div className="space-y-3">
@@ -199,8 +198,8 @@ export default function POSPage() {
                                             key={method}
                                             onClick={() => setPaymentMethod(method)}
                                             className={`py-3 px-4 rounded-lg text-sm font-medium border transition-all ${paymentMethod === method
-                                                    ? 'bg-indigo-600 text-white border-indigo-500 ring-2 ring-indigo-500/20'
-                                                    : 'bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700'
+                                                ? 'bg-indigo-600 text-white border-indigo-500 ring-2 ring-indigo-500/20'
+                                                : 'bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700'
                                                 }`}
                                         >
                                             {method === 'CASH' ? 'Efectivo' :

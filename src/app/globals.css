@@ -39,7 +39,7 @@ body {
   color: var(--foreground);
   background: var(--background);
   font-family: var(--font-geist-sans), "Inter", sans-serif;
-  antialiased;
+  @apply antialiased;
 }
 
 /* Utilities for Linear Style */
