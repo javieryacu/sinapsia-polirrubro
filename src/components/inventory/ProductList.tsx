@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { getProducts } from '@/services/productService'
-import { Database } from '../../../types/database.types'
+import { Database } from '@/types/database.types'
 
 type Product = Database['public']['Tables']['products']['Row']
 

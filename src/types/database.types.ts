@@ -98,6 +98,35 @@ export interface Database {
                     user_id?: string | null
                     created_at?: string
                 }
+            },
+            sale_items: {
+                Row: {
+                    id: string
+                    sale_id: string
+                    product_id: string
+                    quantity: number
+                    unit_price: number
+                    subtotal: number
+                    created_at: string
+                }
+                Insert: {
+                    id?: string
+                    sale_id: string
+                    product_id: string
+                    quantity: number
+                    unit_price: number
+                    subtotal: number
+                    created_at?: string
+                }
+                Update: {
+                    id?: string
+                    sale_id?: string
+                    product_id?: string
+                    quantity?: number
+                    unit_price?: number
+                    subtotal?: number
+                    created_at?: string
+                }
             }
         }
     }
